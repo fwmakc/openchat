@@ -128,7 +128,7 @@ wss://server.com/ws
         "icon": "base64-encoded-image",
         "type": "public" | "protected",
         "visible": true,
-        "join": true,
+        "allowJoin": true,
         "userCount": 10
       }
     ]
@@ -161,7 +161,7 @@ wss://server.com/ws
       "lastName": "Smith",
       "avatar": "base64-encoded-image",
       "status": "online" | "offline" | "away",
-      "discoverable": true
+      "allowFind": true
     },
     "chats": ["chat-uuid-1", "chat-uuid-2"]
   }
@@ -191,7 +191,7 @@ wss://server.com/ws
     "lastName": "Johnson",
     "avatar": "base64-encoded-image",
     "status": "online",
-    "discoverable": true
+    "allowFind": true
   }
 }
 ```
@@ -209,7 +209,7 @@ wss://server.com/ws
     "lastName": "Johnson",
     "avatar": "base64-encoded-image",
     "status": "online",
-    "discoverable": true
+    "allowFind": true
   }
 }
 ```
@@ -225,7 +225,7 @@ wss://server.com/ws
     "lastName": "Johnson",
     "avatar": "base64-encoded-image",
     "status": "online",
-    "discoverable": true
+    "allowFind": true
   }
 }
 ```
@@ -255,7 +255,7 @@ wss://server.com/ws
         "icon": "base64-encoded-image",
         "type": "public" | "protected",
         "visible": true,
-        "join": true,
+        "allowJoin": true,
         "userCount": 10,
         "unreadCount": 5
       }
@@ -424,7 +424,7 @@ wss://server.com/ws
     "icon": "base64-encoded-image",
     "type": "public" | "protected",
     "visible": true,
-    "join": true,
+    "allowJoin": true,
     "settings": {
       "maxUsers": 100,
       "messageSize": 4096,
@@ -470,7 +470,7 @@ wss://server.com/ws
     "icon": "base64-encoded-image",
     "type": "public" | "protected",
     "visible": true,
-    "join": true,
+    "allowJoin": true,
     "settings": {
       "maxUsers": 100,
       "messageSize": 4096,
@@ -502,7 +502,7 @@ wss://server.com/ws
     "description": "New description",
     "icon": "base64-encoded-image",
     "visible": true,
-    "join": false,
+    "allowJoin": false,
     "settings": {
       "maxUsers": 200,
       "messageSize": 8192
@@ -786,6 +786,42 @@ wss://server.com/ws
   "data": {
     "chatId": "chat-uuid",
     "messageId": "message-uuid"
+  }
+}
+```
+
+### Получить реакции сообщения
+
+**Запрос:**
+```json
+{
+  "type": "message.reactions",
+  "connectionId": "connection-uuid",
+  "data": {
+    "chatId": "chat-uuid",
+    "messageId": "message-uuid"
+  }
+}
+```
+
+**Ответ:**
+```json
+{
+  "type": "message.reactions.success",
+  "data": {
+    "messageId": "message-uuid",
+    "reactions": [
+      {
+        "reaction": "👍",
+        "count": 3,
+        "emails": ["alice@gmail.com", "bob@gmail.com", "charlie@gmail.com"]
+      },
+      {
+        "reaction": "❤️",
+        "count": 1,
+        "emails": ["alice@gmail.com"]
+      }
+    ]
   }
 }
 ```
@@ -1089,7 +1125,7 @@ wss://server.com/ws
 - `UNSUPPORTED_FORMAT` — формат не поддерживается (например, MessagePack)
 - `INVITE_DENIED` — нет прав на приглашение
 - `USER_ALREADY_IN_CHAT` — пользователь уже в чате
-- `JOIN_CLOSED` — присоединение к чату закрыто
+- `NOT_ALLOW_JOIN` — присоединение к чату запрещено
 - `USER_HIDDEN` — пользователь скрыт
 - `CHAT_HIDDEN` — чат скрыт
 - `REGISTRATION_CLOSED` — регистрация в чат закрыта
