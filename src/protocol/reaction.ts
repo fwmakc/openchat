@@ -1,9 +1,10 @@
+import type { BaseRequest, BaseResponse } from './handshake.js'
 import type { ReactionAction } from '../types/index.js'
 
 /**
  * Запрос на добавление реакции
  */
-export interface ReactionAddRequest {
+export interface ReactionAddRequest extends BaseRequest {
   type: 'reaction.add'
   connectionId: string
   data: {
@@ -19,7 +20,7 @@ export interface ReactionAddRequest {
 /**
  * Запрос на удаление реакции
  */
-export interface ReactionRemoveRequest {
+export interface ReactionRemoveRequest extends BaseRequest {
   type: 'reaction.remove'
   connectionId: string
   data: {
@@ -27,13 +28,14 @@ export interface ReactionRemoveRequest {
     chatId: string
     /** ID сообщения */
     messageId: string
+    reaction: string
   }
 }
 
 /**
  * Успешный ответ на добавление реакции
  */
-export interface ReactionAddSuccessResponse {
+export interface ReactionAddSuccessResponse extends BaseResponse {
   type: 'reaction.add.success'
   data: {
     /** ID чата */
@@ -48,20 +50,21 @@ export interface ReactionAddSuccessResponse {
 /**
  * Успешный ответ на удаление реакции
  */
-export interface ReactionRemoveSuccessResponse {
+export interface ReactionRemoveSuccessResponse extends BaseResponse {
   type: 'reaction.remove.success'
   data: {
     /** ID чата */
     chatId: string
     /** ID сообщения */
     messageId: string
+    reaction: string
   }
 }
 
 /**
  * Уведомление о реакции (server push)
  */
-export interface ReactionNotification {
+export interface ReactionNotification extends BaseResponse {
   type: 'reaction.notification'
   data: {
     /** ID чата */

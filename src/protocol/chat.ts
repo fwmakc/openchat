@@ -1,9 +1,10 @@
+import type { BaseRequest, BaseResponse } from './handshake.js'
 import type { ChatSettings, ChatInfo, UserRole, ChatType, ChatUserDetails } from '../types/index.js'
 
 /**
  * Запрос на подключение к чату
  */
-export interface AuthConnectRequest {
+export interface AuthConnectRequest extends BaseRequest {
   type: 'auth.connect'
   data: {
     /** Email пользователя */
@@ -18,7 +19,7 @@ export interface AuthConnectRequest {
 /**
  * Успешный ответ на подключение к чату
  */
-export interface AuthConnectSuccessResponse {
+export interface AuthConnectSuccessResponse extends BaseResponse {
   type: 'auth.connect.success'
   data: {
     /** ID соединения */
@@ -33,7 +34,7 @@ export interface AuthConnectSuccessResponse {
 /**
  * Ответ: требуется верификация email
  */
-export interface AuthVerifyRequiredResponse {
+export interface AuthVerifyRequiredResponse extends BaseResponse {
   type: 'auth.verify_required'
   data: {
     /** Код или ссылка для верификации */
@@ -44,7 +45,7 @@ export interface AuthVerifyRequiredResponse {
 /**
  * Запрос на подтверждение email
  */
-export interface AuthVerifyRequest {
+export interface AuthVerifyRequest extends BaseRequest {
   type: 'auth.verify'
   data: {
     /** Email пользователя */
@@ -61,7 +62,7 @@ export interface AuthVerifyRequest {
 /**
  * Успешный ответ на подтверждение email
  */
-export interface AuthVerifySuccessResponse {
+export interface AuthVerifySuccessResponse extends BaseResponse {
   type: 'auth.verify.success'
   data: {
     /** ID соединения */
@@ -71,10 +72,49 @@ export interface AuthVerifySuccessResponse {
   }
 }
 
+export interface AuthDisconnectRequest extends BaseRequest {
+  type: 'auth.disconnect'
+  connectionId: string
+  data: {
+    chatId: string
+  }
+}
+
+export interface AuthDisconnectSuccessResponse extends BaseResponse {
+  type: 'auth.disconnect.success'
+  data: {
+    connectionId: string
+  }
+}
+
+export interface ConnectionRevokeRequest extends BaseRequest {
+  type: 'connection.revoke'
+  connectionId: string
+  data: {
+    targetConnectionId: string
+    chatId: string
+  }
+}
+
+export interface ConnectionRevokeSuccessResponse extends BaseResponse {
+  type: 'connection.revoke.success'
+  data: {
+    connectionId: string
+  }
+}
+
+export interface ConnectionRevokedNotification extends BaseResponse {
+  type: 'connection.revoked'
+  data: {
+    chatId: string
+    reason: 'user_revoked' | 'moderator_revoked'
+  }
+}
+
 /**
  * Запрос на создание чата
  */
-export interface ChatCreateRequest {
+export interface ChatCreateRequest extends BaseRequest {
   type: 'chat.create'
   connectionId: string
   data: {
@@ -98,7 +138,7 @@ export interface ChatCreateRequest {
 /**
  * Успешный ответ на создание чата
  */
-export interface ChatCreateSuccessResponse {
+export interface ChatCreateSuccessResponse extends BaseResponse {
   type: 'chat.create.success'
   data: {
     /** ID созданного чата */
@@ -111,7 +151,7 @@ export interface ChatCreateSuccessResponse {
 /**
  * Запрос информации о чате
  */
-export interface ChatInfoRequest {
+export interface ChatInfoRequest extends BaseRequest {
   type: 'chat.info'
   connectionId: string
   data: {
@@ -123,7 +163,7 @@ export interface ChatInfoRequest {
 /**
  * Ответ с информацией о чате
  */
-export interface ChatInfoResponse {
+export interface ChatInfoResponse extends BaseResponse {
   type: 'chat.info.success'
   data: ChatInfo
 }
@@ -131,7 +171,7 @@ export interface ChatInfoResponse {
 /**
  * Запрос на обновление настроек чата
  */
-export interface ChatUpdateRequest {
+export interface ChatUpdateRequest extends BaseRequest {
   type: 'chat.update'
   connectionId: string
   data: {
@@ -155,7 +195,7 @@ export interface ChatUpdateRequest {
 /**
  * Успешный ответ на обновление чата
  */
-export interface ChatUpdateSuccessResponse {
+export interface ChatUpdateSuccessResponse extends BaseResponse {
   type: 'chat.update.success'
   data: {
     /** ID чата */
@@ -163,10 +203,33 @@ export interface ChatUpdateSuccessResponse {
   }
 }
 
+export interface ChatDeleteRequest extends BaseRequest {
+  type: 'chat.delete'
+  connectionId: string
+  data: {
+    chatId: string
+  }
+}
+
+export interface ChatDeleteSuccessResponse extends BaseResponse {
+  type: 'chat.delete.success'
+  data: {
+    chatId: string
+  }
+}
+
+export interface ChatDeletedNotification extends BaseResponse {
+  type: 'chat.deleted'
+  data: {
+    chatId: string
+    deletedBy: string
+  }
+}
+
 /**
  * Запрос проверки пользователя в чате
  */
-export interface ChatUsersCheckRequest {
+export interface ChatUsersCheckRequest extends BaseRequest {
   type: 'chat.users.check'
   connectionId: string
   data: {
@@ -180,7 +243,7 @@ export interface ChatUsersCheckRequest {
 /**
  * Ответ на проверку пользователя в чате
  */
-export interface ChatUsersCheckResponse {
+export interface ChatUsersCheckResponse extends BaseResponse {
   type: 'chat.users.check.success'
   data: {
     /** Существует ли пользователь в чате */
@@ -193,7 +256,7 @@ export interface ChatUsersCheckResponse {
 /**
  * Запрос списка пользователей чата
  */
-export interface ChatUsersListRequest {
+export interface ChatUsersListRequest extends BaseRequest {
   type: 'chat.users.list'
   connectionId: string
   data: {
@@ -202,10 +265,7 @@ export interface ChatUsersListRequest {
   }
 }
 
-/**
- * Ответ со списком пользователей чата
- */
-export interface ChatUsersListResponse {
+export interface ChatUsersListResponse extends BaseResponse {
   type: 'chat.users.list.success'
   data: {
     /** Список пользователей с деталями */
@@ -213,10 +273,7 @@ export interface ChatUsersListResponse {
   }
 }
 
-/**
- * Запрос на изменение роли пользователя (только защищённый чат)
- */
-export interface ChatUsersSetRoleRequest {
+export interface ChatUsersSetRoleRequest extends BaseRequest {
   type: 'chat.users.set_role'
   connectionId: string
   data: {
@@ -229,10 +286,7 @@ export interface ChatUsersSetRoleRequest {
   }
 }
 
-/**
- * Успешный ответ на изменение роли
- */
-export interface ChatUsersSetRoleSuccessResponse {
+export interface ChatUsersSetRoleSuccessResponse extends BaseResponse {
   type: 'chat.users.set_role.success'
   data: {
     /** ID чата */
@@ -244,10 +298,7 @@ export interface ChatUsersSetRoleSuccessResponse {
   }
 }
 
-/**
- * Запрос на приглашение пользователя в чат
- */
-export interface ChatInviteRequest {
+export interface ChatInviteRequest extends BaseRequest {
   type: 'chat.invite'
   connectionId: string
   data: {
@@ -260,10 +311,7 @@ export interface ChatInviteRequest {
   }
 }
 
-/**
- * Успешный ответ на приглашение
- */
-export interface ChatInviteSuccessResponse {
+export interface ChatInviteSuccessResponse extends BaseResponse {
   type: 'chat.invite.success'
   data: {
     /** ID чата */
@@ -276,7 +324,7 @@ export interface ChatInviteSuccessResponse {
 /**
  * Уведомление о приглашении в чат (server push)
  */
-export interface UserInvitedNotification {
+export interface UserInvitedNotification extends BaseResponse {
   type: 'user.invited'
   data: {
     /** ID чата */
@@ -293,7 +341,7 @@ export interface UserInvitedNotification {
 /**
  * Запрос на выход из чата
  */
-export interface ChatLeaveRequest {
+export interface ChatLeaveRequest extends BaseRequest {
   type: 'chat.leave'
   connectionId: string
   data: {
@@ -305,7 +353,7 @@ export interface ChatLeaveRequest {
 /**
  * Успешный ответ на выход из чата
  */
-export interface ChatLeaveSuccessResponse {
+export interface ChatLeaveSuccessResponse extends BaseResponse {
   type: 'chat.leave.success'
   data: {
     /** ID чата */
@@ -316,7 +364,7 @@ export interface ChatLeaveSuccessResponse {
 /**
  * Запрос на исключение пользователя из чата (owner/moderator only)
  */
-export interface ChatRemoveRequest {
+export interface ChatRemoveRequest extends BaseRequest {
   type: 'chat.remove'
   connectionId: string
   data: {
@@ -330,7 +378,7 @@ export interface ChatRemoveRequest {
 /**
  * Успешный ответ на исключение
  */
-export interface ChatRemoveSuccessResponse {
+export interface ChatRemoveSuccessResponse extends BaseResponse {
   type: 'chat.remove.success'
   data: {
     /** ID чата */
@@ -343,7 +391,7 @@ export interface ChatRemoveSuccessResponse {
 /**
  * Уведомление о вступлении пользователя в чат (server push)
  */
-export interface UserJoinedNotification {
+export interface UserJoinedNotification extends BaseResponse {
   type: 'user.joined'
   data: {
     /** ID чата */
@@ -358,7 +406,7 @@ export interface UserJoinedNotification {
 /**
  * Уведомление о выходе пользователя из чата (server push)
  */
-export interface UserLeftNotification {
+export interface UserLeftNotification extends BaseResponse {
   type: 'user.left'
   data: {
     /** ID чата */
@@ -371,7 +419,7 @@ export interface UserLeftNotification {
 /**
  * Уведомление об исключении пользователя из чата (server push)
  */
-export interface UserRemovedNotification {
+export interface UserRemovedNotification extends BaseResponse {
   type: 'user.removed'
   data: {
     /** ID чата */

@@ -35,6 +35,18 @@ export interface MessageReaction {
   emails: string[]
 }
 
+export interface Message {
+  messageId: string
+  chatId: string
+  senderEmail: string
+  senderConnectionId: string
+  contentType: ContentType
+  content: string
+  timestamp: number
+  editedAt?: number
+  deleted?: boolean
+}
+
 /**
  * Сообщение в чате
  */

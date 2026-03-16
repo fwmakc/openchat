@@ -49,12 +49,36 @@ wss://server.com/ws
 - Если сервер поддерживает — все дальнейшие сообщения в MessagePack
 - Если нет — fallback на JSON
 
+### Request ID
+
+Все запросы могут содержать `requestId` для корреляции:
+
+```json
+{
+  "type": "message.send",
+  "requestId": "client-uuid-123",
+  "connectionId": "connection-uuid",
+  "data": { ... }
+}
+```
+
+Ответ на такой запрос содержит тот же `requestId`:
+
+```json
+{
+  "type": "message.send.success",
+  "requestId": "client-uuid-123",
+  "data": { ... }
+}
+```
+
 ### Handshake
 
 **Запрос:**
 ```json
 {
   "type": "handshake",
+  "requestId": "client-uuid-123",
   "data": {
     "format": "json" | "msgpack",
     "version": "1.0"
@@ -66,12 +90,39 @@ wss://server.com/ws
 ```json
 {
   "type": "handshake.success",
+  "requestId": "client-uuid-123",
   "data": {
     "format": "json" | "msgpack",
-    "version": "1.0"
+    "version": "1.0",
+    "pingInterval": 30000,
+    "pongTimeout": 10000
   }
 }
 ```
+
+### Heartbeat (Ping/Pong)
+
+**Запрос (клиент → сервер):**
+```json
+{
+  "type": "ping",
+  "requestId": "ping-123"
+}
+```
+
+**Ответ:**
+```json
+{
+  "type": "pong",
+  "requestId": "ping-123",
+  "data": {
+    "timestamp": 1234567890
+  }
+}
+```
+
+Если клиент не отправляет ping в течение `pingInterval * 1.5`, сервер закрывает соединение.
+Если сервер не отвечает на ping в течение `pongTimeout`, клиент считает соединение разорванным.
 
 ---
 
@@ -129,6 +180,12 @@ wss://server.com/ws
         "type": "public" | "protected",
         "visible": true,
         "allowJoin": true,
+        "settings": {
+          "maxUsers": 100,
+          "messageSize": 4096,
+          "historyLimit": 1000,
+          "allowedContentTypes": ["text", "media", "poll"]
+        },
         "userCount": 10
       }
     ]
@@ -159,6 +216,8 @@ wss://server.com/ws
       "nickname": "bob",
       "firstName": "Bob",
       "lastName": "Smith",
+      "middleName": "John",
+      "birthday": "1990-01-15",
       "avatar": "base64-encoded-image",
       "status": "online" | "offline" | "away",
       "allowFind": true
@@ -189,6 +248,8 @@ wss://server.com/ws
     "nickname": "alice",
     "firstName": "Alice",
     "lastName": "Johnson",
+    "middleName": "Marie",
+    "birthday": "1992-05-20",
     "avatar": "base64-encoded-image",
     "status": "online",
     "allowFind": true
@@ -207,6 +268,8 @@ wss://server.com/ws
     "nickname": "alice",
     "firstName": "Alice",
     "lastName": "Johnson",
+    "middleName": "Marie",
+    "birthday": "1992-05-20",
     "avatar": "base64-encoded-image",
     "status": "online",
     "allowFind": true
@@ -223,6 +286,8 @@ wss://server.com/ws
     "nickname": "alice",
     "firstName": "Alice",
     "lastName": "Johnson",
+    "middleName": "Marie",
+    "birthday": "1992-05-20",
     "avatar": "base64-encoded-image",
     "status": "online",
     "allowFind": true
@@ -256,6 +321,12 @@ wss://server.com/ws
         "type": "public" | "protected",
         "visible": true,
         "allowJoin": true,
+        "settings": {
+          "maxUsers": 100,
+          "messageSize": 4096,
+          "historyLimit": 1000,
+          "allowedContentTypes": ["text", "media", "poll"]
+        },
         "userCount": 10,
         "unreadCount": 5
       }
@@ -332,6 +403,79 @@ wss://server.com/ws
 }
 ```
 
+**Ответ (код истёк):**
+```json
+{
+  "type": "error",
+  "data": {
+    "code": "CODE_EXPIRED",
+    "message": "Verification code has expired"
+  }
+}
+```
+
+> **TTL кодов верификации:** по умолчанию 15 минут. Настраивается на сервере.
+
+### Отключение от чата (logout)
+
+**Запрос:**
+```json
+{
+  "type": "auth.disconnect",
+  "connectionId": "connection-uuid",
+  "data": {
+    "chatId": "chat-uuid"
+  }
+}
+```
+
+**Ответ:**
+```json
+{
+  "type": "auth.disconnect.success",
+  "data": {
+    "connectionId": "connection-uuid"
+  }
+}
+```
+
+### Отзыв подключения (устройства)
+
+Отзывает конкретное подключение. Если отзывает владелец email — отзывает своё. Если модератор/owner чата — отзывает чужое в рамках чата.
+
+**Запрос:**
+```json
+{
+  "type": "connection.revoke",
+  "connectionId": "connection-uuid",
+  "data": {
+    "targetConnectionId": "connection-uuid-to-revoke",
+    "chatId": "chat-uuid"
+  }
+}
+```
+
+**Ответ:**
+```json
+{
+  "type": "connection.revoke.success",
+  "data": {
+    "connectionId": "revoked-connection-uuid"
+  }
+}
+```
+
+**Server push (отозванному клиенту):**
+```json
+{
+  "type": "connection.revoked",
+  "data": {
+    "chatId": "chat-uuid",
+    "reason": "user_revoked" | "moderator_revoked"
+  }
+}
+```
+
 ---
 
 ## Сообщения
@@ -363,6 +507,85 @@ wss://server.com/ws
   }
 }
 ```
+
+### Редактирование сообщения
+
+**Запрос:**
+```json
+{
+  "type": "message.edit",
+  "connectionId": "connection-uuid",
+  "data": {
+    "chatId": "chat-uuid",
+    "messageId": "message-uuid",
+    "content": "new-encrypted-content-base64"
+  }
+}
+```
+
+**Ответ:**
+```json
+{
+  "type": "message.edit.success",
+  "data": {
+    "messageId": "message-uuid",
+    "serverTimestamp": 1234567890
+  }
+}
+```
+
+**Server push (всем в чате):**
+```json
+{
+  "type": "message.edited",
+  "data": {
+    "messageId": "message-uuid",
+    "chatId": "chat-uuid",
+    "content": "new-encrypted-content-base64",
+    "editedAt": 1234567890
+  }
+}
+```
+
+> **Права:** участник редактирует только свои сообщения. Модератор/owner — любые.
+
+### Удаление сообщения
+
+**Запрос:**
+```json
+{
+  "type": "message.delete",
+  "connectionId": "connection-uuid",
+  "data": {
+    "chatId": "chat-uuid",
+    "messageId": "message-uuid"
+  }
+}
+```
+
+**Ответ:**
+```json
+{
+  "type": "message.delete.success",
+  "data": {
+    "messageId": "message-uuid"
+  }
+}
+```
+
+**Server push (всем в чате):**
+```json
+{
+  "type": "message.deleted",
+  "data": {
+    "messageId": "message-uuid",
+    "chatId": "chat-uuid",
+    "deletedBy": "bob@gmail.com"
+  }
+}
+```
+
+> **Права:** участник удаляет только свои сообщения. Модератор/owner — любые.
 
 ### Получение сообщения (server push)
 
@@ -521,6 +744,42 @@ wss://server.com/ws
 }
 ```
 
+### Удаление чата
+
+> **Права:** только owner. В публичном чате — любой участник может удалить (равноправие).
+
+**Запрос:**
+```json
+{
+  "type": "chat.delete",
+  "connectionId": "connection-uuid",
+  "data": {
+    "chatId": "chat-uuid"
+  }
+}
+```
+
+**Ответ:**
+```json
+{
+  "type": "chat.delete.success",
+  "data": {
+    "chatId": "chat-uuid"
+  }
+}
+```
+
+**Server push (всем в чате):**
+```json
+{
+  "type": "chat.deleted",
+  "data": {
+    "chatId": "chat-uuid",
+    "deletedBy": "alice@gmail.com"
+  }
+}
+```
+
 ---
 
 ## История
@@ -530,11 +789,11 @@ wss://server.com/ws
 **Запрос:**
 ```json
 {
-  "type": "history.get",
+  "type": "messages.history",
   "connectionId": "connection-uuid",
   "data": {
     "chatId": "chat-uuid",
-    "from": "message-uuid-or-timestamp",
+    "from": "message-uuid",
     "limit": 50
   }
 }
@@ -543,9 +802,21 @@ wss://server.com/ws
 **Ответ:**
 ```json
 {
-  "type": "history.get.success",
+  "type": "messages.history.success",
   "data": {
-    "messages": [ ... ],
+    "messages": [
+      {
+        "messageId": "message-uuid",
+        "chatId": "chat-uuid",
+        "senderEmail": "bob@gmail.com",
+        "senderConnectionId": "connection-uuid",
+        "contentType": "text",
+        "content": "encrypted-content-base64",
+        "timestamp": 1234567890,
+        "editedAt": 1234567900,
+        "deleted": false
+      }
+    ],
     "hasMore": true
   }
 }
@@ -774,10 +1045,13 @@ wss://server.com/ws
   "connectionId": "connection-uuid",
   "data": {
     "chatId": "chat-uuid",
-    "messageId": "message-uuid"
+    "messageId": "message-uuid",
+    "reaction": "👍"
   }
 }
 ```
+
+> Если пользователь поставил несколько реакций на одно сообщение, параметр `reaction` обязателен для указания конкретной.
 
 **Ответ:**
 ```json
@@ -785,7 +1059,8 @@ wss://server.com/ws
   "type": "reaction.remove.success",
   "data": {
     "chatId": "chat-uuid",
-    "messageId": "message-uuid"
+    "messageId": "message-uuid",
+    "reaction": "👍"
   }
 }
 ```
@@ -830,6 +1105,22 @@ wss://server.com/ws
 
 ## Сервер-сервер
 
+### Аутентификация серверов
+
+Server-to-server запросы требуют подписи. Каждый сервер имеет keypair.
+
+**Заголовки запроса:**
+```
+X-Server-Signature: base64-signature
+X-Server-Timestamp: 1234567890
+X-Server-Nonce: random-uuid
+```
+
+**Правила:**
+- Подпись = `HMAC-SHA256(serverPrivateKey, requestBody + timestamp + nonce)`
+- Timestamp должен быть в пределах ±5 минут от текущего времени
+- Nonce должен быть уникальным (сервер хранит использованные nonce в течение 10 минут)
+
 ### Проверка пользователя
 
 **Запрос от сервера Б к серверу А:**
@@ -856,13 +1147,17 @@ wss://server.com/ws
 
 ### Challenge для верификации
 
+Защита от replay-атак через timestamp и nonce.
+
 **Запрос:**
 ```json
 {
   "type": "server.challenge",
   "data": {
     "email": "alice@gmail.com",
-    "challenge": "random-string-to-sign"
+    "challenge": "random-string-to-sign",
+    "timestamp": 1234567890,
+    "nonce": "uuid-v4"
   }
 }
 ```
@@ -874,10 +1169,14 @@ wss://server.com/ws
   "data": {
     "email": "alice@gmail.com",
     "challenge": "random-string-to-sign",
-    "signature": "base64-signature"
+    "signature": "base64-signature",
+    "timestamp": 1234567890,
+    "nonce": "uuid-v4"
   }
 }
 ```
+
+> Сервер проверяет: timestamp в пределах ±5 минут, nonce не использовался ранее.
 
 ---
 
@@ -1113,6 +1412,7 @@ wss://server.com/ws
 - `AUTH_REQUIRED` — требуется аутентификация
 - `INVALID_EMAIL` — неверный email
 - `INVALID_CODE` — неверный код подтверждения
+- `CODE_EXPIRED` — код подтверждения истёк
 - `CHAT_NOT_FOUND` — чат не найден
 - `CHAT_FULL` — чат заполнен
 - `PERMISSION_DENIED` — недостаточно прав
@@ -1129,3 +1429,7 @@ wss://server.com/ws
 - `USER_HIDDEN` — пользователь скрыт
 - `CHAT_HIDDEN` — чат скрыт
 - `REGISTRATION_CLOSED` — регистрация в чат закрыта
+- `MESSAGE_NOT_FOUND` — сообщение не найдено
+- `CONNECTION_NOT_FOUND` — подключение не найдено
+- `TIMESTAMP_OUT_OF_RANGE` — timestamp вне допустимого диапазона
+- `NONCE_REUSED` — nonce уже использовался

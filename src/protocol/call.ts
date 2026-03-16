@@ -1,9 +1,10 @@
+import type { BaseRequest, BaseResponse } from './handshake.js'
 import type { CallType, CallEndReason } from '../types/index.js'
 
 /**
  * Запрос на начало звонка
  */
-export interface CallStartRequest {
+export interface CallStartRequest extends BaseRequest {
   type: 'call.start'
   connectionId: string
   data: {
@@ -19,7 +20,7 @@ export interface CallStartRequest {
 /**
  * Успешный ответ на начало звонка
  */
-export interface CallStartSuccessResponse {
+export interface CallStartSuccessResponse extends BaseResponse {
   type: 'call.start.success'
   data: {
     /** ID звонка */
@@ -30,7 +31,7 @@ export interface CallStartSuccessResponse {
 /**
  * Уведомление о входящем звонке (server push)
  */
-export interface CallIncomingNotification {
+export interface CallIncomingNotification extends BaseResponse {
   type: 'call.incoming'
   data: {
     /** ID звонка */
@@ -47,7 +48,7 @@ export interface CallIncomingNotification {
 /**
  * Запрос на ответ на звонок
  */
-export interface CallAnswerRequest {
+export interface CallAnswerRequest extends BaseRequest {
   type: 'call.answer'
   connectionId: string
   data: {
@@ -61,7 +62,7 @@ export interface CallAnswerRequest {
 /**
  * Успешный ответ на ответ звонка
  */
-export interface CallAnswerSuccessResponse {
+export interface CallAnswerSuccessResponse extends BaseResponse {
   type: 'call.answer.success'
   data: {
     /** ID звонка */
@@ -74,7 +75,7 @@ export interface CallAnswerSuccessResponse {
 /**
  * Запрос на передачу SDP offer
  */
-export interface CallSdpOfferRequest {
+export interface CallSdpOfferRequest extends BaseRequest {
   type: 'call.sdp_offer'
   connectionId: string
   data: {
@@ -90,7 +91,7 @@ export interface CallSdpOfferRequest {
 /**
  * Запрос на передачу SDP answer
  */
-export interface CallSdpAnswerRequest {
+export interface CallSdpAnswerRequest extends BaseRequest {
   type: 'call.sdp_answer'
   connectionId: string
   data: {
@@ -106,7 +107,7 @@ export interface CallSdpAnswerRequest {
 /**
  * Запрос на передачу ICE candidate
  */
-export interface CallIceCandidateRequest {
+export interface CallIceCandidateRequest extends BaseRequest {
   type: 'call.ice_candidate'
   connectionId: string
   data: {
@@ -122,7 +123,7 @@ export interface CallIceCandidateRequest {
 /**
  * Запрос на завершение звонка
  */
-export interface CallEndRequest {
+export interface CallEndRequest extends BaseRequest {
   type: 'call.end'
   connectionId: string
   data: {
@@ -134,7 +135,7 @@ export interface CallEndRequest {
 /**
  * Уведомление о завершении звонка (server push)
  */
-export interface CallEndedNotification {
+export interface CallEndedNotification extends BaseResponse {
   type: 'call.ended'
   data: {
     /** ID звонка */

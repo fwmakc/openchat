@@ -1,3 +1,4 @@
+import type { BaseRequest, BaseResponse } from './handshake.js'
 import type {
   ServerInfo,
   Chat,
@@ -9,14 +10,14 @@ import type {
 /**
  * Запрос информации о сервере
  */
-export interface ServerInfoRequest {
+export interface ServerInfoRequest extends BaseRequest {
   type: 'server.info'
 }
 
 /**
  * Ответ с информацией о сервере
  */
-export interface ServerInfoResponse {
+export interface ServerInfoResponse extends BaseResponse {
   type: 'server.info.success'
   data: ServerInfo
 }
@@ -24,14 +25,14 @@ export interface ServerInfoResponse {
 /**
  * Запрос списка чатов на сервере
  */
-export interface ServerChatsRequest {
+export interface ServerChatsRequest extends BaseRequest {
   type: 'server.chats'
 }
 
 /**
  * Ответ со списком чатов
  */
-export interface ServerChatsResponse {
+export interface ServerChatsResponse extends BaseResponse {
   type: 'server.chats.success'
   data: {
     /** Список чатов */
@@ -42,7 +43,7 @@ export interface ServerChatsResponse {
 /**
  * Запрос проверки существования пользователя
  */
-export interface UserCheckRequest {
+export interface UserCheckRequest extends BaseRequest {
   type: 'user.check'
   data: {
     /** Email пользователя */
@@ -53,7 +54,7 @@ export interface UserCheckRequest {
 /**
  * Ответ на проверку пользователя
  */
-export interface UserCheckResponse {
+export interface UserCheckResponse extends BaseResponse {
   type: 'user.check.success'
   data: {
     /** Существует ли пользователь */
@@ -68,7 +69,7 @@ export interface UserCheckResponse {
 /**
  * Запрос профиля пользователя
  */
-export interface UserProfileRequest {
+export interface UserProfileRequest extends BaseRequest {
   type: 'user.profile'
   data: {
     /** Email пользователя */
@@ -79,7 +80,7 @@ export interface UserProfileRequest {
 /**
  * Ответ с профилем пользователя
  */
-export interface UserProfileResponse {
+export interface UserProfileResponse extends BaseResponse {
   type: 'user.profile.success'
   data: UserProfile
 }
@@ -87,7 +88,7 @@ export interface UserProfileResponse {
 /**
  * Запрос на обновление своего профиля
  */
-export interface UserProfileUpdateRequest {
+export interface UserProfileUpdateRequest extends BaseRequest {
   type: 'user.profile.update'
   connectionId: string
   data: UserProfileUpdateData
@@ -96,7 +97,7 @@ export interface UserProfileUpdateRequest {
 /**
  * Успешный ответ на обновление профиля
  */
-export interface UserProfileUpdateSuccessResponse {
+export interface UserProfileUpdateSuccessResponse extends BaseResponse {
   type: 'user.profile.update.success'
   data: UserProfile
 }
@@ -104,7 +105,7 @@ export interface UserProfileUpdateSuccessResponse {
 /**
  * Запрос списка чатов пользователя
  */
-export interface UserChatsRequest {
+export interface UserChatsRequest extends BaseRequest {
   type: 'user.chats'
   data: {
     /** Email пользователя */
@@ -115,7 +116,7 @@ export interface UserChatsRequest {
 /**
  * Ответ со списком чатов пользователя
  */
-export interface UserChatsResponse {
+export interface UserChatsResponse extends BaseResponse {
   type: 'user.chats.success'
   data: {
     /** Чаты с количеством непрочитанных */
@@ -126,7 +127,7 @@ export interface UserChatsResponse {
 /**
  * Уведомление об изменении статуса пользователя (server push)
  */
-export interface UserStatusChangedNotification {
+export interface UserStatusChangedNotification extends BaseResponse {
   type: 'user.status.changed'
   data: {
     /** Email пользователя */

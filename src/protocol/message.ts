@@ -1,9 +1,10 @@
+import type { BaseRequest, BaseResponse } from './handshake.js'
 import type { Message, ContentType, MessageStatus, MessageReaction } from '../types/index.js'
 
 /**
  * Запрос на отправку сообщения
  */
-export interface MessageSendRequest {
+export interface MessageSendRequest extends BaseRequest {
   type: 'message.send'
   connectionId: string
   data: {
@@ -23,7 +24,7 @@ export interface MessageSendRequest {
 /**
  * Успешный ответ на отправку сообщения
  */
-export interface MessageSendSuccessResponse {
+export interface MessageSendSuccessResponse extends BaseResponse {
   type: 'message.send.success'
   data: {
     /** ID сообщения */
@@ -33,10 +34,45 @@ export interface MessageSendSuccessResponse {
   }
 }
 
+export interface MessageEditedNotification extends BaseResponse {
+  type: 'message.edited'
+  data: {
+    messageId: string
+    chatId: string
+    content: string
+    editedAt: number
+  }
+}
+
+export interface MessageDeleteRequest extends BaseRequest {
+  type: 'message.delete'
+  connectionId: string
+  data: {
+    chatId: string
+    messageId: string
+  }
+}
+
+export interface MessageDeleteSuccessResponse extends BaseResponse {
+  type: 'message.delete.success'
+  data: {
+    messageId: string
+  }
+}
+
+export interface MessageDeletedNotification extends BaseResponse {
+  type: 'message.deleted'
+  data: {
+    messageId: string
+    chatId: string
+    deletedBy: string
+  }
+}
+
 /**
  * Уведомление о новом сообщении (server push)
  */
-export interface MessageReceiveNotification {
+export interface MessageReceiveNotification extends BaseResponse {
   type: 'message.receive'
   data: Message
 }
@@ -44,7 +80,7 @@ export interface MessageReceiveNotification {
 /**
  * Запрос на обновление статуса сообщения
  */
-export interface MessageStatusRequest {
+export interface MessageStatusRequest extends BaseRequest {
   type: 'message.status'
   connectionId: string
   data: {
@@ -58,7 +94,7 @@ export interface MessageStatusRequest {
 /**
  * Успешный ответ на обновление статуса
  */
-export interface MessageStatusSuccessResponse {
+export interface MessageStatusSuccessResponse extends BaseResponse {
   type: 'message.status.success'
   data: {
     /** ID сообщения */
@@ -71,7 +107,7 @@ export interface MessageStatusSuccessResponse {
 /**
  * Уведомление об изменении статуса сообщения (server push)
  */
-export interface MessageStatusNotification {
+export interface MessageStatusNotification extends BaseResponse {
   type: 'message.status.notification'
   data: {
     /** ID сообщения */
@@ -88,7 +124,7 @@ export interface MessageStatusNotification {
 /**
  * Запрос на получение истории сообщений
  */
-export interface MessagesHistoryRequest {
+export interface MessagesHistoryRequest extends BaseRequest {
   type: 'messages.history'
   connectionId: string
   data: {
@@ -104,7 +140,7 @@ export interface MessagesHistoryRequest {
 /**
  * Ответ с историей сообщений
  */
-export interface MessagesHistoryResponse {
+export interface MessagesHistoryResponse extends BaseResponse {
   type: 'messages.history.success'
   data: {
     /** Сообщения */
@@ -117,7 +153,7 @@ export interface MessagesHistoryResponse {
 /**
  * Запрос на получение реакций сообщения
  */
-export interface MessageReactionsRequest {
+export interface MessageReactionsRequest extends BaseRequest {
   type: 'message.reactions'
   connectionId: string
   data: {
@@ -131,7 +167,7 @@ export interface MessageReactionsRequest {
 /**
  * Ответ с реакциями сообщения
  */
-export interface MessageReactionsResponse {
+export interface MessageReactionsResponse extends BaseResponse {
   type: 'message.reactions.success'
   data: {
     /** ID сообщения */

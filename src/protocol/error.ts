@@ -1,3 +1,5 @@
+import type { BaseResponse } from './handshake.js'
+
 /**
  * Код ошибки протокола
  */
@@ -5,6 +7,7 @@ export type ErrorCode =
   | 'AUTH_REQUIRED'
   | 'INVALID_EMAIL'
   | 'INVALID_CODE'
+  | 'CODE_EXPIRED'
   | 'CHAT_NOT_FOUND'
   | 'CHAT_FULL'
   | 'PERMISSION_DENIED'
@@ -21,6 +24,10 @@ export type ErrorCode =
   | 'USER_HIDDEN'
   | 'CHAT_HIDDEN'
   | 'REGISTRATION_CLOSED'
+  | 'MESSAGE_NOT_FOUND'
+  | 'CONNECTION_NOT_FOUND'
+  | 'TIMESTAMP_OUT_OF_RANGE'
+  | 'NONCE_REUSED'
 
 /**
  * Описание кодов ошибок:
@@ -48,7 +55,7 @@ export type ErrorCode =
 /**
  * Ответ с ошибкой
  */
-export interface ErrorResponse {
+export interface ErrorResponse extends BaseResponse {
   type: 'error'
   data: {
     /** Код ошибки */
