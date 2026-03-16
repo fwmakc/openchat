@@ -4,6 +4,7 @@
  */
 
 export * from './handshake.js'
+export * from './auth.js'
 export * from './server.js'
 export * from './chat.js'
 export * from './message.js'
