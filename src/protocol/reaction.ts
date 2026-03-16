@@ -1,8 +1,15 @@
+/**
+ * @fileoverview Протокол реакций на сообщения
+ * @module protocol/reaction
+ */
+
 import type { BaseRequest, BaseResponse } from './handshake.js'
 import type { ReactionAction } from '../types/index.js'
 
 /**
  * Запрос на добавление реакции
+ * @interface ReactionAddRequest
+ * @extends {BaseRequest}
  */
 export interface ReactionAddRequest extends BaseRequest {
   type: 'reaction.add'
@@ -19,6 +26,9 @@ export interface ReactionAddRequest extends BaseRequest {
 
 /**
  * Запрос на удаление реакции
+ * Параметр reaction обязателен, если пользователь поставил несколько реакций
+ * @interface ReactionRemoveRequest
+ * @extends {BaseRequest}
  */
 export interface ReactionRemoveRequest extends BaseRequest {
   type: 'reaction.remove'
@@ -28,12 +38,15 @@ export interface ReactionRemoveRequest extends BaseRequest {
     chatId: string
     /** ID сообщения */
     messageId: string
+    /** Реакция для удаления (emoji) */
     reaction: string
   }
 }
 
 /**
  * Успешный ответ на добавление реакции
+ * @interface ReactionAddSuccessResponse
+ * @extends {BaseResponse}
  */
 export interface ReactionAddSuccessResponse extends BaseResponse {
   type: 'reaction.add.success'
@@ -49,6 +62,8 @@ export interface ReactionAddSuccessResponse extends BaseResponse {
 
 /**
  * Успешный ответ на удаление реакции
+ * @interface ReactionRemoveSuccessResponse
+ * @extends {BaseResponse}
  */
 export interface ReactionRemoveSuccessResponse extends BaseResponse {
   type: 'reaction.remove.success'
@@ -57,12 +72,15 @@ export interface ReactionRemoveSuccessResponse extends BaseResponse {
     chatId: string
     /** ID сообщения */
     messageId: string
+    /** Удалённая реакция */
     reaction: string
   }
 }
 
 /**
  * Уведомление о реакции (server push)
+ * @interface ReactionNotification
+ * @extends {BaseResponse}
  */
 export interface ReactionNotification extends BaseResponse {
   type: 'reaction.notification'
@@ -75,7 +93,7 @@ export interface ReactionNotification extends BaseResponse {
     email: string
     /** Реакция (emoji) */
     reaction: string
-    /** Действие */
+    /** Действие: add или remove */
     action: ReactionAction
   }
 }

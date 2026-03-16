@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Протокол серверных запросов
+ * @module protocol/server
+ */
+
 import type { BaseRequest, BaseResponse } from './handshake.js'
 import type {
   ServerInfo,
@@ -9,6 +14,8 @@ import type {
 
 /**
  * Запрос информации о сервере
+ * @interface ServerInfoRequest
+ * @extends {BaseRequest}
  */
 export interface ServerInfoRequest extends BaseRequest {
   type: 'server.info'
@@ -16,6 +23,8 @@ export interface ServerInfoRequest extends BaseRequest {
 
 /**
  * Ответ с информацией о сервере
+ * @interface ServerInfoResponse
+ * @extends {BaseResponse}
  */
 export interface ServerInfoResponse extends BaseResponse {
   type: 'server.info.success'
@@ -24,13 +33,17 @@ export interface ServerInfoResponse extends BaseResponse {
 
 /**
  * Запрос списка чатов на сервере
+ * @interface ServerChatsRequest
+ * @extends {BaseRequest}
  */
 export interface ServerChatsRequest extends BaseRequest {
   type: 'server.chats'
 }
 
 /**
- * Ответ со списком чатов
+ * Ответ со списком чатов сервера
+ * @interface ServerChatsResponse
+ * @extends {BaseResponse}
  */
 export interface ServerChatsResponse extends BaseResponse {
   type: 'server.chats.success'
@@ -42,6 +55,8 @@ export interface ServerChatsResponse extends BaseResponse {
 
 /**
  * Запрос проверки существования пользователя
+ * @interface UserCheckRequest
+ * @extends {BaseRequest}
  */
 export interface UserCheckRequest extends BaseRequest {
   type: 'user.check'
@@ -53,6 +68,8 @@ export interface UserCheckRequest extends BaseRequest {
 
 /**
  * Ответ на проверку пользователя
+ * @interface UserCheckResponse
+ * @extends {BaseResponse}
  */
 export interface UserCheckResponse extends BaseResponse {
   type: 'user.check.success'
@@ -68,6 +85,8 @@ export interface UserCheckResponse extends BaseResponse {
 
 /**
  * Запрос профиля пользователя
+ * @interface UserProfileRequest
+ * @extends {BaseRequest}
  */
 export interface UserProfileRequest extends BaseRequest {
   type: 'user.profile'
@@ -79,6 +98,8 @@ export interface UserProfileRequest extends BaseRequest {
 
 /**
  * Ответ с профилем пользователя
+ * @interface UserProfileResponse
+ * @extends {BaseResponse}
  */
 export interface UserProfileResponse extends BaseResponse {
   type: 'user.profile.success'
@@ -87,6 +108,8 @@ export interface UserProfileResponse extends BaseResponse {
 
 /**
  * Запрос на обновление своего профиля
+ * @interface UserProfileUpdateRequest
+ * @extends {BaseRequest}
  */
 export interface UserProfileUpdateRequest extends BaseRequest {
   type: 'user.profile.update'
@@ -96,6 +119,8 @@ export interface UserProfileUpdateRequest extends BaseRequest {
 
 /**
  * Успешный ответ на обновление профиля
+ * @interface UserProfileUpdateSuccessResponse
+ * @extends {BaseResponse}
  */
 export interface UserProfileUpdateSuccessResponse extends BaseResponse {
   type: 'user.profile.update.success'
@@ -104,6 +129,8 @@ export interface UserProfileUpdateSuccessResponse extends BaseResponse {
 
 /**
  * Запрос списка чатов пользователя
+ * @interface UserChatsRequest
+ * @extends {BaseRequest}
  */
 export interface UserChatsRequest extends BaseRequest {
   type: 'user.chats'
@@ -115,6 +142,8 @@ export interface UserChatsRequest extends BaseRequest {
 
 /**
  * Ответ со списком чатов пользователя
+ * @interface UserChatsResponse
+ * @extends {BaseResponse}
  */
 export interface UserChatsResponse extends BaseResponse {
   type: 'user.chats.success'
@@ -126,6 +155,8 @@ export interface UserChatsResponse extends BaseResponse {
 
 /**
  * Уведомление об изменении статуса пользователя (server push)
+ * @interface UserStatusChangedNotification
+ * @extends {BaseResponse}
  */
 export interface UserStatusChangedNotification extends BaseResponse {
   type: 'user.status.changed'

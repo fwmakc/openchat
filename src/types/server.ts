@@ -1,12 +1,21 @@
+/**
+ * @fileoverview Типы данных сервера
+ * @module types/server
+ */
+
 import type { ContentType } from './message.js'
 
 /**
  * Возможности сервера
+ * - msgpack: поддержка формата MessagePack
+ * - webrtc: поддержка WebRTC звонков
+ * @typedef {'msgpack' | 'webrtc'} ServerFeature
  */
 export type ServerFeature = 'msgpack' | 'webrtc'
 
 /**
  * Лимиты сервера
+ * @interface ServerLimits
  */
 export interface ServerLimits {
   /** Максимальное количество пользователей на сервере */
@@ -19,11 +28,12 @@ export interface ServerLimits {
 
 /**
  * Настройки сервера
+ * @interface ServerSettings
  */
 export interface ServerSettings {
   /** Открыта ли регистрация */
   registrationOpen: boolean
-  /** Доверенные серверы */
+  /** Доверенные серверы (URL) */
   trustedServers: string[]
   /** Белый список email доменов */
   emailWhitelist: string[]
@@ -53,6 +63,7 @@ export interface ServerSettings {
 
 /**
  * Информация о сервере
+ * @interface ServerInfo
  */
 export interface ServerInfo {
   /** URL сервера */

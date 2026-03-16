@@ -1,8 +1,15 @@
+/**
+ * @fileoverview Протокол сообщений
+ * @module protocol/message
+ */
+
 import type { BaseRequest, BaseResponse } from './handshake.js'
 import type { Message, ContentType, MessageStatus, MessageReaction } from '../types/index.js'
 
 /**
  * Запрос на отправку сообщения
+ * @interface MessageSendRequest
+ * @extends {BaseRequest}
  */
 export interface MessageSendRequest extends BaseRequest {
   type: 'message.send'
@@ -23,6 +30,8 @@ export interface MessageSendRequest extends BaseRequest {
 
 /**
  * Успешный ответ на отправку сообщения
+ * @interface MessageSendSuccessResponse
+ * @extends {BaseResponse}
  */
 export interface MessageSendSuccessResponse extends BaseResponse {
   type: 'message.send.success'
@@ -34,43 +43,110 @@ export interface MessageSendSuccessResponse extends BaseResponse {
   }
 }
 
+/**
+ * Запрос на редактирование сообщения
+ * Участник редактирует только свои. Модератор/owner — любые.
+ * @interface MessageEditRequest
+ * @extends {BaseRequest}
+ */
+export interface MessageEditRequest extends BaseRequest {
+  type: 'message.edit'
+  connectionId: string
+  data: {
+    /** ID чата */
+    chatId: string
+    /** ID сообщения */
+    messageId: string
+    /** Новое зашифрованное содержимое (base64) */
+    content: string
+  }
+}
+
+/**
+ * Успешный ответ на редактирование сообщения
+ * @interface MessageEditSuccessResponse
+ * @extends {BaseResponse}
+ */
+export interface MessageEditSuccessResponse extends BaseResponse {
+  type: 'message.edit.success'
+  data: {
+    /** ID сообщения */
+    messageId: string
+    /** Unix timestamp редактирования */
+    serverTimestamp: number
+  }
+}
+
+/**
+ * Уведомление о редактировании сообщения (server push)
+ * @interface MessageEditedNotification
+ * @extends {BaseResponse}
+ */
 export interface MessageEditedNotification extends BaseResponse {
   type: 'message.edited'
   data: {
+    /** ID сообщения */
     messageId: string
+    /** ID чата */
     chatId: string
+    /** Новое зашифрованное содержимое (base64) */
     content: string
+    /** Unix timestamp редактирования */
     editedAt: number
   }
 }
 
+/**
+ * Запрос на удаление сообщения
+ * Участник удаляет только свои. Модератор/owner — любые.
+ * @interface MessageDeleteRequest
+ * @extends {BaseRequest}
+ */
 export interface MessageDeleteRequest extends BaseRequest {
   type: 'message.delete'
   connectionId: string
   data: {
+    /** ID чата */
     chatId: string
+    /** ID сообщения */
     messageId: string
   }
 }
 
+/**
+ * Успешный ответ на удаление сообщения
+ * @interface MessageDeleteSuccessResponse
+ * @extends {BaseResponse}
+ */
 export interface MessageDeleteSuccessResponse extends BaseResponse {
   type: 'message.delete.success'
   data: {
+    /** ID сообщения */
     messageId: string
   }
 }
 
+/**
+ * Уведомление об удалении сообщения (server push)
+ * @interface MessageDeletedNotification
+ * @extends {BaseResponse}
+ */
 export interface MessageDeletedNotification extends BaseResponse {
   type: 'message.deleted'
   data: {
+    /** ID сообщения */
     messageId: string
+    /** ID чата */
     chatId: string
+    /** Email удалившего */
     deletedBy: string
   }
 }
 
 /**
  * Уведомление о новом сообщении (server push)
+ * @interface MessageReceiveNotification
+ * @extends {BaseResponse}
  */
 export interface MessageReceiveNotification extends BaseResponse {
   type: 'message.receive'
@@ -79,6 +155,8 @@ export interface MessageReceiveNotification extends BaseResponse {
 
 /**
  * Запрос на обновление статуса сообщения
+ * @interface MessageStatusRequest
+ * @extends {BaseRequest}
  */
 export interface MessageStatusRequest extends BaseRequest {
   type: 'message.status'
@@ -93,6 +171,8 @@ export interface MessageStatusRequest extends BaseRequest {
 
 /**
  * Успешный ответ на обновление статуса
+ * @interface MessageStatusSuccessResponse
+ * @extends {BaseResponse}
  */
 export interface MessageStatusSuccessResponse extends BaseResponse {
   type: 'message.status.success'
@@ -106,6 +186,8 @@ export interface MessageStatusSuccessResponse extends BaseResponse {
 
 /**
  * Уведомление об изменении статуса сообщения (server push)
+ * @interface MessageStatusNotification
+ * @extends {BaseResponse}
  */
 export interface MessageStatusNotification extends BaseResponse {
   type: 'message.status.notification'
@@ -123,6 +205,8 @@ export interface MessageStatusNotification extends BaseResponse {
 
 /**
  * Запрос на получение истории сообщений
+ * @interface MessagesHistoryRequest
+ * @extends {BaseRequest}
  */
 export interface MessagesHistoryRequest extends BaseRequest {
   type: 'messages.history'
@@ -139,6 +223,8 @@ export interface MessagesHistoryRequest extends BaseRequest {
 
 /**
  * Ответ с историей сообщений
+ * @interface MessagesHistoryResponse
+ * @extends {BaseResponse}
  */
 export interface MessagesHistoryResponse extends BaseResponse {
   type: 'messages.history.success'
@@ -152,6 +238,8 @@ export interface MessagesHistoryResponse extends BaseResponse {
 
 /**
  * Запрос на получение реакций сообщения
+ * @interface MessageReactionsRequest
+ * @extends {BaseRequest}
  */
 export interface MessageReactionsRequest extends BaseRequest {
   type: 'message.reactions'
@@ -166,6 +254,8 @@ export interface MessageReactionsRequest extends BaseRequest {
 
 /**
  * Ответ с реакциями сообщения
+ * @interface MessageReactionsResponse
+ * @extends {BaseResponse}
  */
 export interface MessageReactionsResponse extends BaseResponse {
   type: 'message.reactions.success'

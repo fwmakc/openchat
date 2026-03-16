@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Экспорт всех протокольных типов
+ * @module protocol
+ */
+
 export * from './handshake.js'
 export * from './server.js'
 export * from './chat.js'

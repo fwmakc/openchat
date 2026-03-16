@@ -1,24 +1,32 @@
+/**
+ * @fileoverview Типы данных чата
+ * @module types/chat
+ */
+
 import type { UserStatus, UserProfile } from './user.js'
 import type { ContentType } from './message.js'
 
 /**
  * Тип чата
- * - public: открытый чат
- * - protected: защищённый чат с ролями
+ * - public: открытый чат, все участники равны
+ * - protected: защищённый чат с ролями и E2E шифрованием
+ * @typedef {'public' | 'protected'} ChatType
  */
 export type ChatType = 'public' | 'protected'
 
 /**
  * Роль пользователя в чате
- * - owner: владелец (полный контроль)
- * - moderator: модератор (управляет пользователями)
- * - member: участник (полный доступ)
+ * - owner: владелец (полный контроль, управляет списком владельцев)
+ * - moderator: модератор (управляет пользователями и сообщениями)
+ * - member: участник (полный доступ к чтению и написанию)
  * - observer: наблюдатель (только чтение)
+ * @typedef {'owner' | 'moderator' | 'member' | 'observer'} UserRole
  */
 export type UserRole = 'owner' | 'moderator' | 'member' | 'observer'
 
 /**
  * Настройки чата
+ * @interface ChatSettings
  */
 export interface ChatSettings {
   /** Максимальное количество пользователей */
@@ -32,7 +40,8 @@ export interface ChatSettings {
 }
 
 /**
- * Чат (краткая информация)
+ * Чат (краткая информация для списков)
+ * @interface Chat
  */
 export interface Chat {
   /** ID чата */
@@ -57,6 +66,8 @@ export interface Chat {
 
 /**
  * Полная информация о чате со списком пользователей
+ * @interface ChatInfo
+ * @extends {Omit<Chat, 'userCount'>}
  */
 export interface ChatInfo extends Omit<Chat, 'userCount'> {
   /** Список пользователей (кратко) */
@@ -65,6 +76,7 @@ export interface ChatInfo extends Omit<Chat, 'userCount'> {
 
 /**
  * Краткая информация о пользователе в чате
+ * @interface ChatUserInfo
  */
 export interface ChatUserInfo extends Pick<UserProfile, 'email' | 'nickname'> {
   /** Количество активных соединений */
@@ -75,6 +87,8 @@ export interface ChatUserInfo extends Pick<UserProfile, 'email' | 'nickname'> {
 
 /**
  * Подробная информация о пользователе в чате
+ * @interface ChatUserDetails
+ * @extends {ChatUserInfo}
  */
 export interface ChatUserDetails extends ChatUserInfo {
   /** Имя */
@@ -91,6 +105,7 @@ export interface ChatUserDetails extends ChatUserInfo {
 
 /**
  * Информация о соединении
+ * @interface ConnectionInfo
  */
 export interface ConnectionInfo {
   /** ID соединения */

@@ -1,8 +1,16 @@
+/**
+ * @fileoverview Протокол WebRTC звонков
+ * Сервер используется только для сигнализации. Медиа-трафик идёт P2P.
+ * @module protocol/call
+ */
+
 import type { BaseRequest, BaseResponse } from './handshake.js'
 import type { CallType, CallEndReason } from '../types/index.js'
 
 /**
  * Запрос на начало звонка
+ * @interface CallStartRequest
+ * @extends {BaseRequest}
  */
 export interface CallStartRequest extends BaseRequest {
   type: 'call.start'
@@ -10,15 +18,17 @@ export interface CallStartRequest extends BaseRequest {
   data: {
     /** ID чата */
     chatId: string
-    /** Тип звонка */
+    /** Тип звонка: audio или video */
     callType: CallType
-    /** Email адресатов */
+    /** Email адресатов звонка */
     targetEmails: string[]
   }
 }
 
 /**
  * Успешный ответ на начало звонка
+ * @interface CallStartSuccessResponse
+ * @extends {BaseResponse}
  */
 export interface CallStartSuccessResponse extends BaseResponse {
   type: 'call.start.success'
@@ -30,6 +40,8 @@ export interface CallStartSuccessResponse extends BaseResponse {
 
 /**
  * Уведомление о входящем звонке (server push)
+ * @interface CallIncomingNotification
+ * @extends {BaseResponse}
  */
 export interface CallIncomingNotification extends BaseResponse {
   type: 'call.incoming'
@@ -46,7 +58,9 @@ export interface CallIncomingNotification extends BaseResponse {
 }
 
 /**
- * Запрос на ответ на звонок
+ * Запрос на ответ на звонок (принять/отклонить)
+ * @interface CallAnswerRequest
+ * @extends {BaseRequest}
  */
 export interface CallAnswerRequest extends BaseRequest {
   type: 'call.answer'
@@ -54,13 +68,15 @@ export interface CallAnswerRequest extends BaseRequest {
   data: {
     /** ID звонка */
     callId: string
-    /** Принять или отклонить */
+    /** Принять (true) или отклонить (false) */
     accept: boolean
   }
 }
 
 /**
  * Успешный ответ на ответ звонка
+ * @interface CallAnswerSuccessResponse
+ * @extends {BaseResponse}
  */
 export interface CallAnswerSuccessResponse extends BaseResponse {
   type: 'call.answer.success'
@@ -73,7 +89,9 @@ export interface CallAnswerSuccessResponse extends BaseResponse {
 }
 
 /**
- * Запрос на передачу SDP offer
+ * Запрос на передачу SDP offer (WebRTC сигнализация)
+ * @interface CallSdpOfferRequest
+ * @extends {BaseRequest}
  */
 export interface CallSdpOfferRequest extends BaseRequest {
   type: 'call.sdp_offer'
@@ -89,7 +107,9 @@ export interface CallSdpOfferRequest extends BaseRequest {
 }
 
 /**
- * Запрос на передачу SDP answer
+ * Запрос на передачу SDP answer (WebRTC сигнализация)
+ * @interface CallSdpAnswerRequest
+ * @extends {BaseRequest}
  */
 export interface CallSdpAnswerRequest extends BaseRequest {
   type: 'call.sdp_answer'
@@ -105,7 +125,9 @@ export interface CallSdpAnswerRequest extends BaseRequest {
 }
 
 /**
- * Запрос на передачу ICE candidate
+ * Запрос на передачу ICE candidate (WebRTC сигнализация)
+ * @interface CallIceCandidateRequest
+ * @extends {BaseRequest}
  */
 export interface CallIceCandidateRequest extends BaseRequest {
   type: 'call.ice_candidate'
@@ -122,6 +144,8 @@ export interface CallIceCandidateRequest extends BaseRequest {
 
 /**
  * Запрос на завершение звонка
+ * @interface CallEndRequest
+ * @extends {BaseRequest}
  */
 export interface CallEndRequest extends BaseRequest {
   type: 'call.end'
@@ -134,6 +158,8 @@ export interface CallEndRequest extends BaseRequest {
 
 /**
  * Уведомление о завершении звонка (server push)
+ * @interface CallEndedNotification
+ * @extends {BaseResponse}
  */
 export interface CallEndedNotification extends BaseResponse {
   type: 'call.ended'
