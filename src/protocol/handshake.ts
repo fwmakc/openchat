@@ -1,17 +1,17 @@
-export type DataFormat = 'json' | 'msgpack';
+export type DataFormat = 'json' | 'msgpack'
 
 export interface HandshakeRequest {
-  type: 'handshake';
+  type: 'handshake'
   data: {
-    format: DataFormat;
-    version: string;
-  };
+    format: DataFormat
+    version: string
+  }
 }
 
 export interface HandshakeSuccessResponse {
-  type: 'handshake.success';
+  type: 'handshake.success'
   data: {
-    format: DataFormat;
-    version: string;
-  };
+    format: DataFormat
+    version: string
+  }
 }

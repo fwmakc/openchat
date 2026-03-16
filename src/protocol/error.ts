@@ -1,9 +1,9 @@
 export interface ErrorResponse {
-  type: 'error';
+  type: 'error'
   data: {
-    code: ErrorCode;
-    message: string;
-  };
+    code: ErrorCode
+    message: string
+  }
 }
 
 export type ErrorCode =
@@ -27,8 +27,8 @@ export type ErrorCode =
   | 'CHAT_HIDDEN'
   | 'REGISTRATION_CLOSED'
   | 'ALREADY_IN_CHAT'
-  | 'INVITE_PERMISSION_DENIED';
+  | 'INVITE_PERMISSION_DENIED'
 
 export function createError(code: ErrorCode, message: string): ErrorResponse {
-  return { type: 'error', data: { code, message } };
+  return { type: 'error', data: { code, message } }
 }
