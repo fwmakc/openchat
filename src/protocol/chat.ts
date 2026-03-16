@@ -1,4 +1,4 @@
-import type { ChatSettings, ChatInfo, ParticipantRole, ParticipantDetails } from '../types/index.js'
+import type { ChatSettings, ChatInfo, UserRole, ChatType, ChatUserDetails } from '../types/index.js'
 
 export interface AuthConnectRequest {
   type: 'auth.connect'
@@ -50,7 +50,7 @@ export interface ChatCreateRequest {
     name: string
     description?: string
     icon?: string
-    type: 'public' | 'protected'
+    type: ChatType
     visible: boolean
     join: boolean
     settings?: Partial<ChatSettings>
@@ -99,8 +99,8 @@ export interface ChatUpdateSuccessResponse {
   }
 }
 
-export interface ChatCheckUserRequest {
-  type: 'chat.check_user'
+export interface ChatUsersCheckRequest {
+  type: 'chat.users.check'
   connectionId: string
   data: {
     chatId: string
@@ -108,36 +108,45 @@ export interface ChatCheckUserRequest {
   }
 }
 
-export interface ChatCheckUserResponse {
-  type: 'chat.check_user.success'
+export interface ChatUsersCheckResponse {
+  type: 'chat.users.check.success'
   data: {
     exists: boolean
-    role?: ParticipantRole
+    role?: UserRole
   }
 }
 
-export interface ParticipantsListRequest {
-  type: 'participants.list'
+export interface ChatUsersListRequest {
+  type: 'chat.users.list'
   connectionId: string
   data: {
     chatId: string
   }
 }
 
-export interface ParticipantsListResponse {
-  type: 'participants.list.success'
+export interface ChatUsersListResponse {
+  type: 'chat.users.list.success'
   data: {
-    participants: ParticipantDetails[]
+    users: ChatUserDetails[]
   }
 }
 
-export interface ParticipantsSetRoleRequest {
-  type: 'participants.set_role'
+export interface ChatUsersSetRoleRequest {
+  type: 'chat.users.set_role'
   connectionId: string
   data: {
     chatId: string
-    targetEmail: string
-    role: ParticipantRole
+    email: string
+    role: UserRole
+  }
+}
+
+export interface ChatUsersSetRoleSuccessResponse {
+  type: 'chat.users.set_role.success'
+  data: {
+    chatId: string
+    email: string
+    role: UserRole
   }
 }
 
@@ -147,7 +156,7 @@ export interface ChatInviteRequest {
   data: {
     chatId: string
     email: string
-    role: ParticipantRole
+    role: UserRole
   }
 }
 
@@ -159,13 +168,13 @@ export interface ChatInviteSuccessResponse {
   }
 }
 
-export interface ChatInvitedNotification {
-  type: 'chat.invited'
+export interface UserInvitedNotification {
+  type: 'user.invited'
   data: {
     chatId: string
     chatName: string
     inviterEmail: string
-    role: ParticipantRole
+    role: UserRole
   }
 }
 
@@ -177,9 +186,49 @@ export interface ChatLeaveRequest {
   }
 }
 
-export interface ChatKickRequest {
-  type: 'chat.kick'
+export interface ChatLeaveSuccessResponse {
+  type: 'chat.leave.success'
+  data: {
+    chatId: string
+  }
+}
+
+export interface ChatRemoveRequest {
+  type: 'chat.remove'
   connectionId: string
+  data: {
+    chatId: string
+    email: string
+  }
+}
+
+export interface ChatRemoveSuccessResponse {
+  type: 'chat.remove.success'
+  data: {
+    chatId: string
+    email: string
+  }
+}
+
+export interface UserJoinedNotification {
+  type: 'user.joined'
+  data: {
+    chatId: string
+    email: string
+    role: UserRole
+  }
+}
+
+export interface UserLeftNotification {
+  type: 'user.left'
+  data: {
+    chatId: string
+    email: string
+  }
+}
+
+export interface UserRemovedNotification {
+  type: 'user.removed'
   data: {
     chatId: string
     email: string

@@ -1,4 +1,4 @@
-import type { Message } from '../types/index.js'
+import type { Message, ContentType, MessageStatus } from '../types/index.js'
 
 export interface MessageSendRequest {
   type: 'message.send'
@@ -6,7 +6,7 @@ export interface MessageSendRequest {
   data: {
     chatId: string
     messageId: string
-    contentType: string
+    contentType: ContentType
     content: string
     timestamp: number
   }
@@ -30,7 +30,25 @@ export interface MessageStatusRequest {
   connectionId: string
   data: {
     messageId: string
-    status: 'delivered' | 'read'
+    status: Exclude<MessageStatus, 'sent'>
+  }
+}
+
+export interface MessageStatusSuccessResponse {
+  type: 'message.status.success'
+  data: {
+    messageId: string
+    status: Exclude<MessageStatus, 'sent'>
+  }
+}
+
+export interface MessageStatusNotification {
+  type: 'message.status.notification'
+  data: {
+    messageId: string
+    chatId: string
+    email: string
+    status: Exclude<MessageStatus, 'sent'>
   }
 }
 

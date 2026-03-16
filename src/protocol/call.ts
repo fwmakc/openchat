@@ -1,9 +1,11 @@
+import type { CallType, CallEndReason } from '../types/index.js'
+
 export interface CallStartRequest {
   type: 'call.start'
   connectionId: string
   data: {
     chatId: string
-    callType: 'audio' | 'video'
+    callType: CallType
     targetEmails: string[]
   }
 }
@@ -21,7 +23,7 @@ export interface CallIncomingNotification {
     callId: string
     chatId: string
     callerEmail: string
-    callType: 'audio' | 'video'
+    callType: CallType
   }
 }
 
@@ -76,6 +78,14 @@ export interface CallEndedNotification {
   type: 'call.ended'
   data: {
     callId: string
-    reason: 'hangup' | 'rejected' | 'timeout' | 'error'
+    reason: CallEndReason
+  }
+}
+
+export interface CallAnswerSuccessResponse {
+  type: 'call.answer.success'
+  data: {
+    callId: string
+    accepted: boolean
   }
 }

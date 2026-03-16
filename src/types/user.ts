@@ -7,13 +7,7 @@ export interface UserProfile {
   lastName?: string
   avatar?: string
   status: UserStatus
-  visible: boolean
+  discoverable: boolean
 }
 
-export interface Connection {
-  connectionId: string
-  email: string
-  chatId: string
-  publicKey: string
-  createdAt: number
-}
+export type UserProfileUpdateData = Partial<Omit<UserProfile, 'email'>>

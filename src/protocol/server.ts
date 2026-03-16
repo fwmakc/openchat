@@ -1,4 +1,10 @@
-import type { ServerInfo, Chat, UserProfile } from '../types/index.js'
+import type {
+  ServerInfo,
+  Chat,
+  UserProfile,
+  UserProfileUpdateData,
+  UserStatus,
+} from '../types/index.js'
 
 export interface ServerInfoRequest {
   type: 'server.info'
@@ -51,7 +57,12 @@ export interface UserProfileResponse {
 export interface UserProfileUpdateRequest {
   type: 'user.profile.update'
   connectionId: string
-  data: Partial<UserProfile>
+  data: UserProfileUpdateData
+}
+
+export interface UserProfileUpdateSuccessResponse {
+  type: 'user.profile.update.success'
+  data: UserProfile
 }
 
 export interface UserChatsRequest {
@@ -65,5 +76,14 @@ export interface UserChatsResponse {
   type: 'user.chats.success'
   data: {
     chats: (Chat & { unreadCount: number })[]
+  }
+}
+
+export interface UserStatusChangedNotification {
+  type: 'user.status.changed'
+  data: {
+    email: string
+    status: UserStatus
+    chatIds: string[]
   }
 }

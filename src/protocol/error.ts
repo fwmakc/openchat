@@ -26,9 +26,3 @@ export type ErrorCode =
   | 'USER_HIDDEN'
   | 'CHAT_HIDDEN'
   | 'REGISTRATION_CLOSED'
-  | 'ALREADY_IN_CHAT'
-  | 'INVITE_PERMISSION_DENIED'
-
-export function createError(code: ErrorCode, message: string): ErrorResponse {
-  return { type: 'error', data: { code, message } }
-}

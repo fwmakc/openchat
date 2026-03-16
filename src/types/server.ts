@@ -1,5 +1,9 @@
+import type { ContentType } from './message.js'
+
+export type ServerFeature = 'msgpack' | 'webrtc'
+
 export interface ServerLimits {
-  maxParticipants: number
+  maxUsers: number
   maxMessageSize: number
   rateLimit: number
 }
@@ -15,10 +19,10 @@ export interface ServerSettings {
   chatCreationOpen: boolean
   allowPublicChats: boolean
   allowProtectedChats: boolean
-  maxParticipantsPerChat: number
+  maxUsersPerChat: number
   maxMessageSize: number
   historyLimit: number
-  allowedContentTypes: string[]
+  allowedContentTypes: ContentType[]
 }
 
 export interface ServerInfo {
@@ -27,6 +31,6 @@ export interface ServerInfo {
   description?: string
   icon?: string
   version: string
-  features: string[]
+  features: ServerFeature[]
   limits: ServerLimits
 }

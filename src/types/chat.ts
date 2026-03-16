@@ -1,13 +1,14 @@
-import type { UserStatus } from './user.js'
+import type { UserStatus, UserProfile } from './user.js'
+import type { ContentType } from './message.js'
 
 export type ChatType = 'public' | 'protected'
-export type ParticipantRole = 'owner' | 'moderator' | 'member' | 'observer'
+export type UserRole = 'owner' | 'moderator' | 'member' | 'observer'
 
 export interface ChatSettings {
-  maxParticipants: number
+  maxUsers: number
   messageSize: number
   historyLimit: number
-  allowedContentTypes: string[]
+  allowedContentTypes: ContentType[]
 }
 
 export interface Chat {
@@ -19,24 +20,27 @@ export interface Chat {
   visible: boolean
   join: boolean
   settings: ChatSettings
-  participantCount: number
+  userCount: number
 }
 
-export interface ChatInfo extends Chat {
-  participants: ParticipantInfo[]
+export interface ChatInfo extends Omit<Chat, 'userCount'> {
+  users: ChatUserInfo[]
 }
 
-export interface ParticipantInfo {
-  email: string
-  nickname?: string
+export interface ChatUserInfo extends Pick<UserProfile, 'email' | 'nickname'> {
   connections: number
-  role: ParticipantRole
+  role: UserRole
 }
 
-export interface ParticipantDetails extends ParticipantInfo {
+export interface ChatUserDetails extends ChatUserInfo {
   firstName?: string
   lastName?: string
   avatar?: string
   status: UserStatus
-  connectionIds: { connectionId: string; connectedAt: number }[]
+  connectionIds: ConnectionInfo[]
+}
+
+export interface ConnectionInfo {
+  connectionId: string
+  connectedAt: number
 }

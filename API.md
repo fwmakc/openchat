@@ -98,7 +98,7 @@ wss://server.com/ws
     "version": "1.0.0",
     "features": ["msgpack", "webrtc"],
     "limits": {
-      "maxParticipants": 1000,
+      "maxUsers": 1000,
       "maxMessageSize": 65536,
       "rateLimit": 100
     }
@@ -129,7 +129,7 @@ wss://server.com/ws
         "type": "public" | "protected",
         "visible": true,
         "join": true,
-        "participants": 10
+        "userCount": 10
       }
     ]
   }
@@ -160,7 +160,8 @@ wss://server.com/ws
       "firstName": "Bob",
       "lastName": "Smith",
       "avatar": "base64-encoded-image",
-      "status": "online" | "offline" | "away"
+      "status": "online" | "offline" | "away",
+      "discoverable": true
     },
     "chats": ["chat-uuid-1", "chat-uuid-2"]
   }
@@ -190,7 +191,7 @@ wss://server.com/ws
     "lastName": "Johnson",
     "avatar": "base64-encoded-image",
     "status": "online",
-    "visible": true
+    "discoverable": true
   }
 }
 ```
@@ -208,7 +209,23 @@ wss://server.com/ws
     "lastName": "Johnson",
     "avatar": "base64-encoded-image",
     "status": "online",
-    "visible": true
+    "discoverable": true
+  }
+}
+```
+
+**Ответ:**
+```json
+{
+  "type": "user.profile.update.success",
+  "data": {
+    "email": "alice@gmail.com",
+    "nickname": "alice",
+    "firstName": "Alice",
+    "lastName": "Johnson",
+    "avatar": "base64-encoded-image",
+    "status": "online",
+    "discoverable": true
   }
 }
 ```
@@ -239,7 +256,7 @@ wss://server.com/ws
         "type": "public" | "protected",
         "visible": true,
         "join": true,
-        "participants": 10,
+        "userCount": 10,
         "unreadCount": 5
       }
     ]
@@ -379,6 +396,17 @@ wss://server.com/ws
 }
 ```
 
+**Ответ:**
+```json
+{
+  "type": "message.status.success",
+  "data": {
+    "messageId": "message-uuid",
+    "status": "delivered"
+  }
+}
+```
+
 ---
 
 ## Чаты
@@ -398,7 +426,7 @@ wss://server.com/ws
     "visible": true,
     "join": true,
     "settings": {
-      "maxParticipants": 100,
+      "maxUsers": 100,
       "messageSize": 4096,
       "historyLimit": 1000,
       "allowedContentTypes": ["text", "media", "poll"]
@@ -444,12 +472,12 @@ wss://server.com/ws
     "visible": true,
     "join": true,
     "settings": {
-      "maxParticipants": 100,
+      "maxUsers": 100,
       "messageSize": 4096,
       "historyLimit": 1000,
       "allowedContentTypes": ["text", "media", "poll"]
     },
-    "participants": [
+    "users": [
       {
         "email": "alice@gmail.com",
         "nickname": "alice",
@@ -457,31 +485,6 @@ wss://server.com/ws
         "role": "owner" | "moderator" | "member" | "observer"
       }
     ]
-  }
-}
-```
-
-### Проверка участника в чате
-
-**Запрос:**
-```json
-{
-  "type": "chat.check_user",
-  "connectionId": "connection-uuid",
-  "data": {
-    "chatId": "chat-uuid",
-    "email": "bob@gmail.com"
-  }
-}
-```
-
-**Ответ:**
-```json
-{
-  "type": "chat.check_user.success",
-  "data": {
-    "exists": true,
-    "role": "member"
   }
 }
 ```
@@ -501,7 +504,7 @@ wss://server.com/ws
     "visible": true,
     "join": false,
     "settings": {
-      "maxParticipants": 200,
+      "maxUsers": 200,
       "messageSize": 8192
     }
   }
@@ -514,92 +517,6 @@ wss://server.com/ws
   "type": "chat.update.success",
   "data": {
     "chatId": "chat-uuid"
-  }
-}
-```
-
-**Ответ:**
-```json
-{
-  "type": "chat.check_user.success",
-  "data": {
-    "exists": true,
-    "role": "member"
-  }
-}
-```
-
-### Обновить настройки чата
-
-**Запрос:**
-```json
-{
-  "type": "chat.update",
-  "connectionId": "connection-uuid",
-  "data": {
-    "chatId": "chat-uuid",
-    "name": "New Name",
-    "description": "New description",
-    "icon": "base64-encoded-image",
-    "visible": true,
-    "join": false,
-    "settings": {
-      "maxParticipants": 200,
-      "messageSize": 8192
-    }
-  }
-}
-```
-
-**Ответ:**
-```json
-{
-  "type": "chat.update.success",
-  "data": {
-    "chatId": "chat-uuid"
-  }
-}
-```
-
-**Ответ:**
-```json
-{
-  "type": "chat.create.success",
-  "data": {
-    "chatId": "chat-uuid",
-    "encryptedChatKey": "base64-encoded-encrypted-key"
-  }
-}
-```
-
-### Информация о чате
-
-**Запрос:**
-```json
-{
-  "type": "chat.info",
-  "connectionId": "connection-uuid",
-  "data": {
-    "chatId": "chat-uuid"
-  }
-}
-```
-
-**Ответ:**
-```json
-{
-  "type": "chat.info.success",
-  "data": {
-    "chatId": "chat-uuid",
-    "type": "public" | "protected",
-    "settings": { ... },
-    "participants": [
-      {
-        "email": "alice@gmail.com",
-        "connections": 2,
-        "role": "owner" | "moderator" | "member" | "observer"
-      }
-    ]
   }
 }
 ```
@@ -636,14 +553,39 @@ wss://server.com/ws
 
 ---
 
-## Участники
+## Пользователи в чате
 
-### Список участников
+### Проверка пользователя в чате
 
 **Запрос:**
 ```json
 {
-  "type": "participants.list",
+  "type": "chat.users.check",
+  "connectionId": "connection-uuid",
+  "data": {
+    "chatId": "chat-uuid",
+    "email": "bob@gmail.com"
+  }
+}
+```
+
+**Ответ:**
+```json
+{
+  "type": "chat.users.check.success",
+  "data": {
+    "exists": true,
+    "role": "member"
+  }
+}
+```
+
+### Список пользователей
+
+**Запрос:**
+```json
+{
+  "type": "chat.users.list",
   "connectionId": "connection-uuid",
   "data": {
     "chatId": "chat-uuid"
@@ -654,9 +596,9 @@ wss://server.com/ws
 **Ответ:**
 ```json
 {
-  "type": "participants.list.success",
+  "type": "chat.users.list.success",
   "data": {
-    "participants": [
+    "users": [
       {
         "email": "alice@gmail.com",
         "nickname": "alice",
@@ -664,7 +606,7 @@ wss://server.com/ws
         "lastName": "Smith",
         "avatar": "base64-encoded-image",
         "status": "online",
-        "connections": [
+        "connectionIds": [
           { "connectionId": "uuid", "connectedAt": 1234567890 }
         ],
         "role": "owner"
@@ -679,11 +621,23 @@ wss://server.com/ws
 **Запрос:**
 ```json
 {
-  "type": "participants.set_role",
+  "type": "chat.users.set_role",
   "connectionId": "connection-uuid",
   "data": {
     "chatId": "chat-uuid",
-    "targetEmail": "bob@gmail.com",
+    "email": "bob@gmail.com",
+    "role": "moderator"
+  }
+}
+```
+
+**Ответ:**
+```json
+{
+  "type": "chat.users.set_role.success",
+  "data": {
+    "chatId": "chat-uuid",
+    "email": "bob@gmail.com",
     "role": "moderator"
   }
 }
@@ -692,7 +646,7 @@ wss://server.com/ws
 ### Приглашение в чат
 
 **Правила:**
-- Публичный чат: любой участник может пригласить
+- Публичный чат: любой пользователь может пригласить
 - Защищённый чат: только владелец/модератор может пригласить
 
 **Запрос:**
@@ -722,7 +676,7 @@ wss://server.com/ws
 **Server push (уведомление приглашённому):**
 ```json
 {
-  "type": "chat.invited",
+  "type": "user.invited",
   "data": {
     "chatId": "chat-uuid",
     "chatName": "General Discussion",
@@ -745,13 +699,34 @@ wss://server.com/ws
 }
 ```
 
+**Ответ:**
+```json
+{
+  "type": "chat.leave.success",
+  "data": {
+    "chatId": "chat-uuid"
+  }
+}
+```
+
 ### Исключение из чата (только владелец/модератор)
 
 **Запрос:**
 ```json
 {
-  "type": "chat.kick",
+  "type": "chat.remove",
   "connectionId": "connection-uuid",
+  "data": {
+    "chatId": "chat-uuid",
+    "email": "bob@gmail.com"
+  }
+}
+```
+
+**Ответ:**
+```json
+{
+  "type": "chat.remove.success",
   "data": {
     "chatId": "chat-uuid",
     "email": "bob@gmail.com"
@@ -761,9 +736,9 @@ wss://server.com/ws
 
 ---
 
-## Оценки
+## Реакции
 
-### Поставить оценку
+### Поставить реакцию
 
 **Запрос:**
 ```json
@@ -778,13 +753,36 @@ wss://server.com/ws
 }
 ```
 
-### Удалить оценку
+**Ответ:**
+```json
+{
+  "type": "reaction.add.success",
+  "data": {
+    "chatId": "chat-uuid",
+    "messageId": "message-uuid",
+    "reaction": "👍"
+  }
+}
+```
+
+### Удалить реакцию
 
 **Запрос:**
 ```json
 {
   "type": "reaction.remove",
   "connectionId": "connection-uuid",
+  "data": {
+    "chatId": "chat-uuid",
+    "messageId": "message-uuid"
+  }
+}
+```
+
+**Ответ:**
+```json
+{
+  "type": "reaction.remove.success",
   "data": {
     "chatId": "chat-uuid",
     "messageId": "message-uuid"
@@ -905,6 +903,17 @@ wss://server.com/ws
 }
 ```
 
+**Ответ:**
+```json
+{
+  "type": "call.answer.success",
+  "data": {
+    "callId": "call-uuid",
+    "accepted": true
+  }
+}
+```
+
 ### WebRTC сигнализация
 
 **SDP Offer:**
@@ -972,6 +981,83 @@ wss://server.com/ws
 
 ---
 
+## Server push уведомления
+
+### Пользователь присоединился к чату
+```json
+{
+  "type": "user.joined",
+  "data": {
+    "chatId": "chat-uuid",
+    "email": "bob@gmail.com",
+    "role": "member"
+  }
+}
+```
+
+### Пользователь вышел из чата
+```json
+{
+  "type": "user.left",
+  "data": {
+    "chatId": "chat-uuid",
+    "email": "bob@gmail.com"
+  }
+}
+```
+
+### Пользователь исключён из чата
+```json
+{
+  "type": "user.removed",
+  "data": {
+    "chatId": "chat-uuid",
+    "email": "bob@gmail.com"
+  }
+}
+```
+
+### Изменение статуса пользователя
+```json
+{
+  "type": "user.status.changed",
+  "data": {
+    "email": "bob@gmail.com",
+    "status": "online" | "offline" | "away",
+    "chatIds": ["chat-uuid-1", "chat-uuid-2"]
+  }
+}
+```
+
+### Уведомление о реакции
+```json
+{
+  "type": "reaction.notification",
+  "data": {
+    "chatId": "chat-uuid",
+    "messageId": "message-uuid",
+    "email": "bob@gmail.com",
+    "reaction": "👍",
+    "action": "add" | "remove"
+  }
+}
+```
+
+### Уведомление о статусе сообщения
+```json
+{
+  "type": "message.status.notification",
+  "data": {
+    "messageId": "message-uuid",
+    "chatId": "chat-uuid",
+    "email": "bob@gmail.com",
+    "status": "delivered" | "read"
+  }
+}
+```
+
+---
+
 ## Ошибки
 
 Все ошибки имеют формат:
@@ -1007,5 +1093,3 @@ wss://server.com/ws
 - `USER_HIDDEN` — пользователь скрыт
 - `CHAT_HIDDEN` — чат скрыт
 - `REGISTRATION_CLOSED` — регистрация в чат закрыта
-- `ALREADY_IN_CHAT` — пользователь уже в чате
-- `INVITE_PERMISSION_DENIED` — нет прав на приглашение
